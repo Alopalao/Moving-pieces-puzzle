@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import Tk
 from tkinter import Event as TkEvent
 from PIL import Image, ImageTk
+import random
 
 from photos import MyPhoto, MyLabel
 
@@ -13,11 +14,18 @@ class Game:
         self.image_path = image_path
         self.window = Tk(className="screenName")
         self.window.geometry(screenSize)
+        name_label = tk.Label(self.window, text=self.screenName, bg="salmon", font=("Arial", 21))
+        name_label.pack(pady=5)
 
         self.image_label = None
         self.image = self.get_image_from_path(self.image_path)
         self.empty_image = self.get_image_from_path("white-space.png")
         self.image_complete = ImageTk.PhotoImage(self.image)
+
+        self.image_frame = tk.Frame(self.window, width=624, height=624, bg="medium turquoise")
+        self.image_frame.pack(pady=5)
+        self.button_frame = tk.Frame(self.window, width=600, height=200, bg="black")
+        self.button_frame.pack(pady=5)
 
         # Grid 3x3 variables
         self.imagesList: list[MyPhoto] = []
@@ -68,6 +76,7 @@ class Game:
          - The image is next to the selected one.
          - Diagonal positions are not count as next to.
         """
+        #return True
         clicked_row = clicked_label.curr_row
         clicked_col = clicked_label.curr_col
 
@@ -94,19 +103,22 @@ class Game:
     def idk(self):
         self.image_label_complete.config(background="red")
 
+    def clean_screen(self):
+        """Clean the frames on screen."""
+        for widget in self.image_frame.winfo_children():
+            widget.destroy()
+        
+        #for widget in self.button_frame.winfo_children():
+        #    widget.destroy()
+
     def start_round(self):
         """Start a round of game."""
         # Clear old widgets
-        for widget in self.image_frame.winfo_children():
-            widget.destroy()
+        self.clean_screen()
 
         rows = 3
         cols = 3
         size_img = 200
-        #for row in range(rows):
-        #    self.image_frame.grid_rowconfigure(row, weight=1)
-        #for col in range(cols):
-        #    self.image_frame.grid_columnconfigure(col, weight=1)
 
         for row in range(rows):
             for col in range(cols):
@@ -123,29 +135,58 @@ class Game:
                 self.imagesList.append(Aphoto)
                 Alabel = MyLabel(row, col, self.image_frame, Aphoto, self.event)
                 self.labelList.append(Alabel)
-        
+
+    def randomize_pictures(self):
+        """Start by randomizing the position of the pictures."""
+        possible_pos = [
+            (0, 0), (0, 1), (0, 2),
+            (1, 0), (1, 1), (1, 2),
+            (2, 0), (2, 1), (2, 2),
+        ]
+        random.shuffle(possible_pos)
+        random_number = random.randrange(0, 9)
+        (empty_row, empty_col) = possible_pos[random_number]
+        self.imagesList = []
+        self.labelList = []
+
+        rows = 3
+        cols = 3
+        size_img = 200
+        for row in range(rows):
+            for col in range(cols):
+                left = col * size_img
+                right = left + size_img
+                top = row * size_img
+                bottom = top + size_img
+                if row == empty_row and col == empty_col:
+                    cropped = self.empty_image.crop((left, top, right, bottom))
+                    Aphoto = MyPhoto(row, col, cropped, empty=True)
+                else:
+                    cropped = self.image.crop((left, top, right, bottom))
+                    Aphoto = MyPhoto(row, col, cropped)
+                self.imagesList.append(Aphoto)
+
+        self.clean_screen()
+        for i, (row, col) in enumerate(possible_pos):
+            Alabel = MyLabel(row, col, self.image_frame, self.imagesList[i], self.event)
+            self.labelList.append(Alabel)
 
     def start(self):
         "Start game window."
-        name_label = tk.Label(self.window, text=self.screenName, bg="salmon", font=("Arial", 21))
-        name_label.pack(pady=5)
-
-        self.image_frame = tk.Frame(self.window, width=624, height=624, bg="medium turquoise")
-        self.image_frame.pack(pady=5)
-        self.image_frame.grid_rowconfigure(0, weight=1)
-        self.image_frame.grid_columnconfigure(0, weight=1)
+        #self.image_frame.grid_rowconfigure(0, weight=1)
+        #self.image_frame.grid_columnconfigure(0, weight=1)
         #self.image_frame.grid_propagate(0)
-
+        self.clean_screen()
         self.image_label_complete = tk.Label(self.image_frame, image=self.image_complete, background="black", borderwidth=5)
         self.image_label_complete.grid(row=0, column=0)
 
-        click_bt = tk.Button(self.window, text="Click", background='lightcoral', command=self.idk)
+        click_bt = tk.Button(self.button_frame, text="Click", background='lightcoral', command=self.idk)
         click_bt.pack(pady=5)
 
-        click_bt = tk.Button(self.window, text="Start game", background='cyan', command=self.start_round)
+        click_bt = tk.Button(self.button_frame, text="Start game", background='cyan', command=self.randomize_pictures)
         click_bt.pack(pady=5)
 
-        quit_bt = tk.Button(self.window, text="Quit", command=self.window.destroy)
+        quit_bt = tk.Button(self.button_frame, text="Quit", command=self.window.destroy)
         quit_bt.pack(pady=5) 
         self.window.mainloop()
 
