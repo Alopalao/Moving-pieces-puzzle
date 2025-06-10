@@ -3,7 +3,7 @@ from tkinter import Tk
 from tkinter import Event as TkEvent
 from PIL import Image, ImageTk
 import random
-
+from computer import Computer
 from photos import MyPhoto, MyLabel
 
 class Game:
@@ -56,7 +56,6 @@ class Game:
         else:
             if self.able_to_move(clicked_label):
                 selected_image_wd = self.selected_label.image_widget
-
                 self.selected_label.set_image_widget(clicked_label.image_widget, "white")
                 clicked_label.set_image_widget(selected_image_wd)
                 self.selected_label = None
@@ -111,33 +110,9 @@ class Game:
         #for widget in self.button_frame.winfo_children():
         #    widget.destroy()
 
-    def start_round(self):
-        """Start a round of game."""
-        # Clear old widgets
-        self.clean_screen()
-
-        rows = 3
-        cols = 3
-        size_img = 200
-
-        for row in range(rows):
-            for col in range(cols):
-                left = col * size_img
-                right = left + size_img
-                top = row * size_img
-                bottom = top + size_img
-                if row == 2 and col == 2:
-                    cropped = self.empty_image.crop((left, top, right, bottom))
-                    Aphoto = MyPhoto(row, col, cropped, empty=True)
-                else:
-                    cropped = self.image.crop((left, top, right, bottom))
-                    Aphoto = MyPhoto(row, col, cropped)
-                self.imagesList.append(Aphoto)
-                Alabel = MyLabel(row, col, self.image_frame, Aphoto, self.event)
-                self.labelList.append(Alabel)
-
     def randomize_pictures(self):
         """Start by randomizing the position of the pictures."""
+        self.selected_label = None
         possible_pos = [
             (0, 0), (0, 1), (0, 2),
             (1, 0), (1, 1), (1, 2),

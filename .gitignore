@@ -195,3 +195,4 @@ cython_debug/
 
 testing_scripts/
 hw1/
+output/

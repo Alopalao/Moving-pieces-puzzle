@@ -24,6 +24,8 @@ class MyLabel(tk.Label):
         self.curr_col = col
         self.frame = frame
         self.image_widget = image_widget
+        self.image_widget.curr_row = row
+        self.image_widget.curr_col = col
         self.empty = image_widget.empty
 
         #self.label = tk.Label(self.frame, image=self.image_widget, background="white")
