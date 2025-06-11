@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 import random
 from computer import Computer
 from photos import MyPhoto, MyLabel
+from typing import Optional
 
 class Game:
     def __init__(self, screenSize, screenName, image_path:str=None, window:Tk=None):
@@ -35,6 +36,9 @@ class Game:
         self.event = self.on_label_click
         self.selected_label: MyLabel = None
 
+        # Computer steps
+        self.steps = None
+
     def check_for_completion(self):
         for image in self.imagesList:
             if image.curr_col != image.expected_col or image.curr_row != image.expected_row:
@@ -43,6 +47,8 @@ class Game:
 
     def on_label_click(self, event: TkEvent):
         """Click on a label"""
+        self.steps = None
+        
         clicked_label:MyLabel = event.widget
 
         if self.selected_label is None:
@@ -75,14 +81,14 @@ class Game:
          - The image is next to the selected one.
          - Diagonal positions are not count as next to.
         """
-        #return True
+        return True
         clicked_row = clicked_label.curr_row
         clicked_col = clicked_label.curr_col
 
         selected_col = self.selected_label.curr_col
         selected_row = self.selected_label.curr_row
 
-        if not clicked_label.empty and not self.selected_label.empty:
+        if not clicked_label.is_empty and not self.selected_label.is_empty:
             return False
 
         if clicked_row == selected_row:
@@ -100,7 +106,25 @@ class Game:
         return image
 
     def idk(self):
-        self.image_label_complete.config(background="red")
+        if not self.steps:
+            delete_me = Computer(self.imagesList, self.labelList)
+            self.steps = delete_me.steps
+            return
+        else:
+            next_node = self.steps.pop()
+            next_empty = next_node.empty_co
+
+            next_label = None
+            curr_label = None
+            for label in self.labelList:
+                if next_empty[0] == label.curr_row and next_empty[1] == label.curr_col:
+                    next_label = label
+                if label.is_empty:
+                    curr_label = label
+            
+            empty_image = curr_label.image_widget
+            curr_label.set_image_widget(next_label.image_widget)
+            next_label.set_image_widget(empty_image)
 
     def clean_screen(self):
         """Clean the frames on screen."""
@@ -110,17 +134,49 @@ class Game:
         #for widget in self.button_frame.winfo_children():
         #    widget.destroy()
 
+    def get_random_solvable_puzzle(self) -> tuple[list[tuple], int]:
+        """Return a random generated grid but that is possible
+         to solve."""
+        # Random except blank
+        tiles = [i for i in range(0, 9)]
+        random.shuffle(tiles)
+
+        # Determine if it is solvable
+        inversions = 0
+        for i in range(len(tiles)):
+            for j in range(i+1, len(tiles)):
+                if (tiles[i] != 0 and
+                    tiles[j] != 0 and
+                    tiles[i] > tiles[j]
+                ):
+                    inversions += 1
+
+        # If it is not solvable
+        if inversions % 2 != 0:
+            i, j = random.sample(range(0, 9), 2)
+            while 0 in (tiles[i], tiles[j]):
+                i, j = random.sample(range(0, 9), 2)
+            tiles[i], tiles[j] = tiles[j], tiles[i]
+
+        # Get grid style from tiles
+        empty_i = tiles.index(0)
+        grid = []
+        for i in tiles:
+            if i == 0:
+                i = empty_i
+            elif i <= empty_i:
+                i = i - 1
+            col = i % 3
+            row = i//3
+            grid.append((row, col))
+        return grid, empty_i
+
     def randomize_pictures(self):
         """Start by randomizing the position of the pictures."""
         self.selected_label = None
-        possible_pos = [
-            (0, 0), (0, 1), (0, 2),
-            (1, 0), (1, 1), (1, 2),
-            (2, 0), (2, 1), (2, 2),
-        ]
-        random.shuffle(possible_pos)
-        random_number = random.randrange(0, 9)
-        (empty_row, empty_col) = possible_pos[random_number]
+        self.steps = None
+        random_grid, empty_spot = self.get_random_solvable_puzzle()
+        (empty_row, empty_col) = random_grid[empty_spot]
         self.imagesList = []
         self.labelList = []
 
@@ -135,14 +191,14 @@ class Game:
                 bottom = top + size_img
                 if row == empty_row and col == empty_col:
                     cropped = self.empty_image.crop((left, top, right, bottom))
-                    Aphoto = MyPhoto(row, col, cropped, empty=True)
+                    Aphoto = MyPhoto(row, col, cropped, is_empty=True)
                 else:
                     cropped = self.image.crop((left, top, right, bottom))
                     Aphoto = MyPhoto(row, col, cropped)
                 self.imagesList.append(Aphoto)
 
         self.clean_screen()
-        for i, (row, col) in enumerate(possible_pos):
+        for i, (row, col) in enumerate(random_grid):
             Alabel = MyLabel(row, col, self.image_frame, self.imagesList[i], self.event)
             self.labelList.append(Alabel)
 

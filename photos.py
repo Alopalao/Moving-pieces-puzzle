@@ -5,7 +5,7 @@ from tkinter import Event as TkEvent
 from typing import Optional
 
 class MyPhoto(ImageTk.PhotoImage):
-    def __init__(self, row: int, col: int, image:Image.Image, empty=False):
+    def __init__(self, row: int, col: int, image:Image.Image, is_empty=False):
         super().__init__(image)
         self.curr_row = row
         self.curr_col = col
@@ -13,8 +13,7 @@ class MyPhoto(ImageTk.PhotoImage):
         self.expected_col = col
 
         self.image = image
-        self.empty = empty
-        
+        self.is_empty = is_empty
 
 
 class MyLabel(tk.Label):
@@ -26,7 +25,7 @@ class MyLabel(tk.Label):
         self.image_widget = image_widget
         self.image_widget.curr_row = row
         self.image_widget.curr_col = col
-        self.empty = image_widget.empty
+        self.is_empty = image_widget.is_empty
 
         #self.label = tk.Label(self.frame, image=self.image_widget, background="white")
         #if self.curr_row == 0 and self.curr_col == 1:
@@ -53,6 +52,6 @@ class MyLabel(tk.Label):
         
         self.config(image=image_widget)
         self.image_widget = image_widget
-        self.empty = image_widget.empty
+        self.is_empty = image_widget.is_empty
         image_widget.curr_row = self.curr_row
         image_widget.curr_col = self.curr_col
