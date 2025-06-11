@@ -6,6 +6,7 @@ import random
 from computer import Computer
 from photos import MyPhoto, MyLabel
 from typing import Optional
+import time
 
 class Game:
     def __init__(self, screenSize, screenName, image_path:str=None, window:Tk=None):
@@ -38,6 +39,7 @@ class Game:
 
         # Computer steps
         self.steps = None
+        self.is_solving = False
 
     def check_for_completion(self):
         for image in self.imagesList:
@@ -47,8 +49,9 @@ class Game:
 
     def on_label_click(self, event: TkEvent):
         """Click on a label"""
+        if self.is_solving:
+            return
         self.steps = None
-        
         clicked_label:MyLabel = event.widget
 
         if self.selected_label is None:
@@ -67,10 +70,10 @@ class Game:
                 self.selected_label = None
             
                 if self.check_for_completion():
-                    print("GAME OVER")
+                    messagebox.showinfo("Game completed!",
+                                        "Go to main menu to start new game.")
 
             else:
-                print("NOT MOVE")
                 self.selected_label.config(background="white")
                 self.selected_label = None
 
@@ -81,7 +84,6 @@ class Game:
          - The image is next to the selected one.
          - Diagonal positions are not count as next to.
         """
-        return True
         clicked_row = clicked_label.curr_row
         clicked_col = clicked_label.curr_col
 
@@ -105,12 +107,17 @@ class Game:
         image = image.resize((600, 600))
         return image
 
-    def idk(self):
+    def auto_solve(self):
+        """Create computer object to create solution steps."""
+        if self.is_solving:
+            return
         if not self.steps:
             delete_me = Computer(self.imagesList, self.labelList)
             self.steps = delete_me.steps
-            return
-        else:
+        self.next_move()
+        
+    def next_move(self):
+        if self.steps:
             next_node = self.steps.pop()
             next_empty = next_node.empty_co
 
@@ -121,10 +128,14 @@ class Game:
                     next_label = label
                 if label.is_empty:
                     curr_label = label
-            
+
             empty_image = curr_label.image_widget
             curr_label.set_image_widget(next_label.image_widget)
             next_label.set_image_widget(empty_image)
+            self.window.after(100, self.next_move)
+        else:
+            if self.check_for_completion():
+                messagebox.showinfo("Game completed!", "Go to main menu to start new game.")
 
     def clean_screen(self):
         """Clean the frames on screen."""
@@ -172,7 +183,8 @@ class Game:
         return grid, empty_i
 
     def randomize_pictures(self):
-        """Start by randomizing the position of the pictures."""
+        """Start by randomizing the position of the pictures.
+         Also starts the gaming phase of the program."""
         # Clean variables
         self.selected_label = None
         self.steps = None
@@ -204,11 +216,18 @@ class Game:
             Alabel = MyLabel(row, col, self.image_frame, self.imagesList[i], self.event)
             self.labelList.append(Alabel)
 
-        click_bt = tk.Button(self.button_frame, text="Click", background='lightcoral', command=self.idk)
-        click_bt.pack(pady=5)
 
-        menu_bt = tk.Button(self.button_frame, text="Main Menu", background='lightcoral', command=self.start)
+        solve_bt = tk.Button(self.button_frame, text="Auto Solve",
+                             background='lightcoral', command=self.auto_solve)
+        solve_bt.pack(pady=5)
+
+        menu_bt = tk.Button(self.button_frame, text="Main Menu",
+                            background='lightcoral', command=self.start)
         menu_bt.pack(pady=5)
+
+        quit_bt = tk.Button(self.button_frame, text="Quit",
+                            command=self.window.destroy)
+        quit_bt.pack(pady=5)
 
     def select_image(self):
         """Select another image to play with."""
@@ -227,7 +246,7 @@ class Game:
                 self.image_complete = ImageTk.PhotoImage(self.image)
                 self.image_label_complete.config(image=self.image_complete)
             except Exception as err:
-                messagebox.showerror("Error", f"Failed to load image: {err}")
+                messagebox.showerror("Error, closing window", f"Failed to load image: {err}")
                 self.window.destroy()
 
     def start(self):
@@ -237,13 +256,20 @@ class Game:
         self.steps = None
         self.clean_screen()
 
-        self.image_label_complete = tk.Label(self.image_frame, image=self.image_complete, background="black", borderwidth=5)
+        self.image_label_complete = tk.Label(self.image_frame, image=self.image_complete,
+                                             background="black", borderwidth=5)
         self.image_label_complete.grid(row=0, column=0)
 
-        click_bt = tk.Button(self.button_frame, text="Start game", background='cyan', command=self.randomize_pictures)
+        click_bt = tk.Button(
+            self.button_frame, text="Start game",
+            background='cyan', command=self.randomize_pictures
+        )
         click_bt.pack(pady=5)
 
-        change_image_bt = tk.Button(self.button_frame, text="Select Image", background='cyan', command=self.select_image)
+        change_image_bt = tk.Button(
+            self.button_frame, text="Select Image",
+            background='cyan', command=self.select_image
+        )
         change_image_bt.pack(pady=5)
 
         quit_bt = tk.Button(self.button_frame, text="Quit", command=self.window.destroy)

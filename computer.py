@@ -63,7 +63,6 @@ class Computer:
     def get_correct_steps(self) -> list[Node]:
         """Get the order of steps to find solution."""
         if self.last_node is None:
-            print("No steps available")
             return []
 
         curr_node = self.last_node
@@ -102,8 +101,6 @@ class Computer:
         visited = set()
         while self.Pqueue:
             current = heappop(self.Pqueue)
-            print(current[1].grid)
-
             curr_score: int = current[0]
             curr_node: Node = current[1]
 
