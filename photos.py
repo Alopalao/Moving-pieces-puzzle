@@ -27,15 +27,6 @@ class MyLabel(tk.Label):
         self.image_widget.curr_col = col
         self.is_empty = image_widget.is_empty
 
-        #self.label = tk.Label(self.frame, image=self.image_widget, background="white")
-        #if self.curr_row == 0 and self.curr_col == 1:
-        #    path = "dummy_images/image_1.png"
-        #    image = Image.open(path)
-        #    image = image.resize((200, 200))
-        #    image = ImageTk.PhotoImage(image)
-        #    self.label = tk.Label(self.frame, image=image)
-        #else:
-        #    self.label = tk.Label(self.frame, image=self.image_widget)
         self.grid(row=self.curr_row, column=self.curr_col)
         self.bind("<Button-1>", event)
         self.configure(height=200,width=200)

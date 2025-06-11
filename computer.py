@@ -37,25 +37,26 @@ class Node:
 
 
     def __eq__(self, value: 'Node'):
-        return self.grid == value.grid and self.empty_co == value.empty_co
+        return self.grid_tuple == value.grid_tuple and self.empty_co == value.empty_co
     
     def __hash__(self):
         return hash((self.grid_tuple, self.empty_co))
 
 class Computer:
     def __init__(self, imagesList: list[MyPhoto], labelList: list[MyLabel]):
+        # Priority queue
         self.Pqueue:list[tuple[int, Node]] = []
         self.imagesList = imagesList
         self.labelList = labelList
         (start_grid, empty) = self.grid_from_imagesList(imagesList)
+        # Root node
         self.start_node = Node(start_grid, empty, None)
         heappush(self.Pqueue, (self.start_node.heu_score, self.start_node))
 
-        # Do not know if it is possible to encounter a puzzle that is not
-        # solvable
-        self.impossible = False
+        # Last Node of the discover path
         self.last_node = None
         self.create_decision_tree()
+
         # The steps are a list of grids
         self.steps: list[Node] = self.get_correct_steps()
 
@@ -93,21 +94,13 @@ class Computer:
             grid[curr_row][curr_col] = (expected_row, expected_col)
             if image.is_empty:
                 empty = (curr_row, curr_col)
-        
-        print("EMPTY -> ", empty)
-        print("GRID -> ", grid)
+
         return grid, empty
     
-    def create_decision_tree(self):
+    def create_decision_tree(self) -> bool:
         """Create the decision tree."""
-        solved_puzzle = False
         visited = set()
-        count = 0
         while self.Pqueue:
-            count += 1
-            #if count == 100:
-            #    print("STAHPP")
-            #    break
             current = heappop(self.Pqueue)
             print(current[1].grid)
 
@@ -120,9 +113,8 @@ class Computer:
             aux_node = None
 
             if curr_node.heu_score == 0:
-                solved_puzzle = True
                 self.last_node = curr_node
-                break
+                return True
             # Possible movements
             # DOWN
             if empty_row + 1 <= 2:
@@ -131,10 +123,7 @@ class Computer:
                 aux_grid[empty_row][empty_col] = curr_grid[empty_row+1][empty_col]
                 aux_node = Node(aux_grid, (empty_row+1, empty_col), curr_node)
                 if aux_node not in visited:
-                    print("ADDED DOWN -> ", aux_node.grid)
                     heappush(self.Pqueue, (aux_node.heu_score, aux_node))
-                else:
-                    print("VISITED")
 
             # UP
             if empty_row - 1 >= 0:
@@ -143,10 +132,7 @@ class Computer:
                 aux_grid[empty_row][empty_col] = curr_grid[empty_row-1][empty_col]
                 aux_node = Node(aux_grid, (empty_row-1, empty_col), curr_node)
                 if aux_node not in visited:
-                    print("ADDED UP -> ", aux_node.grid)
                     heappush(self.Pqueue, (aux_node.heu_score, aux_node))
-                else:
-                    print("VISITED")
 
             # RIGHT
             if empty_col + 1 <= 2:
@@ -155,10 +141,7 @@ class Computer:
                 aux_grid[empty_row][empty_col] = curr_grid[empty_row][empty_col+1]
                 aux_node = Node(aux_grid, (empty_row, empty_col+1), curr_node)
                 if aux_node not in visited:
-                    print("ADDED RIGHT -> ", aux_node.grid)
                     heappush(self.Pqueue, (aux_node.heu_score, aux_node))
-                else:
-                    print("VISITED")
 
             # LEFT
             if empty_col - 1 >= 0:
@@ -167,27 +150,8 @@ class Computer:
                 aux_grid[empty_row][empty_col] = curr_grid[empty_row][empty_col-1]
                 aux_node = Node(aux_grid, (empty_row, empty_col-1), curr_node)
                 if aux_node not in visited:
-                    print("ADDED LEFT -> ", aux_node.grid)
                     heappush(self.Pqueue, (aux_node.heu_score, aux_node))
-                else:
-                    print("VISITED")
 
             visited.add(curr_node)
-            print("Finnish step")
-        
-        if not solved_puzzle:
-            self.impossible = True
 
-
-empty = (1, 1)
-grid = [
-    [(0, 0), (0, 2), (2, 1)],
-    [(0, 1), (1, 2), (1, 0)],
-    [(2, 2), (1, 1), (2, 0)]
-]
-
-next_grid = [
-    [(0, 0), (0, 2), (2, 1)],
-    [(0, 1), (1, 1), (1, 0)],
-    [(2, 2), (1, 2), (2, 0)]
-]
+        return False

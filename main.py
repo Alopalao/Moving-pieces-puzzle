@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Tk
+from tkinter import Tk, filedialog, messagebox
 from tkinter import Event as TkEvent
 from PIL import Image, ImageTk
 import random
@@ -131,8 +131,8 @@ class Game:
         for widget in self.image_frame.winfo_children():
             widget.destroy()
         
-        #for widget in self.button_frame.winfo_children():
-        #    widget.destroy()
+        for widget in self.button_frame.winfo_children():
+            widget.destroy()
 
     def get_random_solvable_puzzle(self) -> tuple[list[tuple], int]:
         """Return a random generated grid but that is possible
@@ -151,7 +151,7 @@ class Game:
                 ):
                     inversions += 1
 
-        # If it is not solvable
+        # If it is not solvable, fix it
         if inversions % 2 != 0:
             i, j = random.sample(range(0, 9), 2)
             while 0 in (tiles[i], tiles[j]):
@@ -173,8 +173,10 @@ class Game:
 
     def randomize_pictures(self):
         """Start by randomizing the position of the pictures."""
+        # Clean variables
         self.selected_label = None
         self.steps = None
+
         random_grid, empty_spot = self.get_random_solvable_puzzle()
         (empty_row, empty_col) = random_grid[empty_spot]
         self.imagesList = []
@@ -202,20 +204,47 @@ class Game:
             Alabel = MyLabel(row, col, self.image_frame, self.imagesList[i], self.event)
             self.labelList.append(Alabel)
 
-    def start(self):
-        "Start game window."
-        #self.image_frame.grid_rowconfigure(0, weight=1)
-        #self.image_frame.grid_columnconfigure(0, weight=1)
-        #self.image_frame.grid_propagate(0)
-        self.clean_screen()
-        self.image_label_complete = tk.Label(self.image_frame, image=self.image_complete, background="black", borderwidth=5)
-        self.image_label_complete.grid(row=0, column=0)
-
         click_bt = tk.Button(self.button_frame, text="Click", background='lightcoral', command=self.idk)
         click_bt.pack(pady=5)
 
+        menu_bt = tk.Button(self.button_frame, text="Main Menu", background='lightcoral', command=self.start)
+        menu_bt.pack(pady=5)
+
+    def select_image(self):
+        """Select another image to play with."""
+        image_path = filedialog.askopenfilename(
+            title="Select an Image",
+            filetypes=[
+                ("Image files", "*.png;*.jpg;*.jpeg"),
+                ("All files", "*.*")
+            ]
+        )
+
+        if image_path:
+            try:
+                self.image_path = image_path
+                self.image = self.get_image_from_path(self.image_path)
+                self.image_complete = ImageTk.PhotoImage(self.image)
+                self.image_label_complete.config(image=self.image_complete)
+            except Exception as err:
+                messagebox.showerror("Error", f"Failed to load image: {err}")
+                self.window.destroy()
+
+    def start(self):
+        "Start game window."
+        # Clean variables5
+        self.selected_label = None
+        self.steps = None
+        self.clean_screen()
+
+        self.image_label_complete = tk.Label(self.image_frame, image=self.image_complete, background="black", borderwidth=5)
+        self.image_label_complete.grid(row=0, column=0)
+
         click_bt = tk.Button(self.button_frame, text="Start game", background='cyan', command=self.randomize_pictures)
         click_bt.pack(pady=5)
+
+        change_image_bt = tk.Button(self.button_frame, text="Select Image", background='cyan', command=self.select_image)
+        change_image_bt.pack(pady=5)
 
         quit_bt = tk.Button(self.button_frame, text="Quit", command=self.window.destroy)
         quit_bt.pack(pady=5) 
