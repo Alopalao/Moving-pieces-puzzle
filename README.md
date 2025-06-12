@@ -3,7 +3,7 @@
 ## How to run
 
 #### Executable
-To run the game out of the box, double click in the file name `Game.exe`
+To run the game out of the box, go into the folder `executable` and double click in `Game.exe`
 
 #### Through Console
 To run the game from a console there is a setup needed:
