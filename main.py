@@ -234,13 +234,8 @@ class Game:
     def select_image(self):
         """Select another image to play with."""
         image_path = filedialog.askopenfilename(
-            title="Select an Image",
-            filetypes=[
-                ("Image files", "*.png;*.jpg;*.jpeg"),
-                ("All files", "*.*")
-            ]
+            title="Select an Image"
         )
-
         if image_path:
             try:
                 self.image_path = image_path
