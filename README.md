@@ -6,36 +6,38 @@
 To run the game out of the box, go into the folder `executable` and double click in `Game.exe`
 
 ### Through Console
+All the console commands are executed inside this folder.
 
 #### MacOS, python
 To run this program in MacOS, python would need to be installed and a package called `pillow`.
-- Install HomeBrew and folow instructions shown after installation
-
-`brew install python`
-
-- Install python
-
-`brew install python`
-
-- Verify python installation, (version could be different)
-
-`python3.13 -V`
-
-- Create virtual environment and activate it.
-
+- Install HomeBrew and folow instructions shown after installation: `brew install python`
+- Install python: `brew install python`
+- Verify python installation, (version could be different): `python3.13 -V`
+- Create virtual environment and activate it:
+```
 `python3.13 -m venv game`
-
 `chmod a+x game/bin/activate`
-
 `source game/bin/activate`
+```
 
-- Install pillow
+- Install pillow: `pip install pillow`
+- Run the program: `python main.py`
 
-`pip install pillow`
+#### Windows, python
+For console commands, `python` could vary so if it does not work with `python`, try with `python3`.
 
-- Run the program
+- Download and install python from: `https://www.python.org/downloads/`
+- Create virtual environment: `python -m venv game`
+- Activate virtual environment: `game\Scripts\activate`
+- Install pillow: `pip install pillow`
+- Run the program: `python main.py`
 
-`python main.py`
+### Debian
+For console commands, `python` could vary so if it does not work with `python`, try with `python3`.
+- Create virtual environment: `python -m venv game`
+- Activate virtual environment: `source game/bin/activate`
+- Install pillow: `pip install pillow`
+- Run the program: `python main.py`
 
 ## In-game options
 
