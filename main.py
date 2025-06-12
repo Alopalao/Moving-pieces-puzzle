@@ -114,6 +114,7 @@ class Game:
         if not self.steps:
             delete_me = Computer(self.imagesList, self.labelList)
             self.steps = delete_me.steps
+        self.is_solving = True
         self.next_move()
         
     def next_move(self):
@@ -136,6 +137,7 @@ class Game:
         else:
             if self.check_for_completion():
                 messagebox.showinfo("Game completed!", "Go to main menu to start new game.")
+            self.is_solving = False
 
     def clean_screen(self):
         """Clean the frames on screen."""
