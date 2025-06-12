@@ -2,6 +2,7 @@ from photos import MyPhoto, MyLabel
 from heapq import heappush, heappop
 from copy import deepcopy
 class Node:
+    """Each Node of the decision Tree"""
     def __init__(
         self,
         grid: list[list[tuple[int, int]]],
@@ -43,6 +44,7 @@ class Node:
         return hash((self.grid_tuple, self.empty_co))
 
 class Computer:
+    """Computer to create the decision tree and store the steps in self.steps"""
     def __init__(self, imagesList: list[MyPhoto], labelList: list[MyLabel]):
         # Priority queue
         self.Pqueue:list[tuple[int, Node]] = []

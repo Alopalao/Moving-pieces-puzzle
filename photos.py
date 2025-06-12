@@ -5,6 +5,7 @@ from tkinter import Event as TkEvent
 from typing import Optional
 
 class MyPhoto(ImageTk.PhotoImage):
+    """Photos objects, its positioning is modifiable."""
     def __init__(self, row: int, col: int, image:Image.Image, is_empty=False):
         super().__init__(image)
         self.curr_row = row
@@ -17,6 +18,7 @@ class MyPhoto(ImageTk.PhotoImage):
 
 
 class MyLabel(tk.Label):
+    """Label objects containing images, its position is static."""
     def __init__(self, row: int, col: int, frame:tk.Frame, image_widget: MyPhoto, event: TkEvent):
         super().__init__(frame, image=image_widget, background="white")
         self.curr_row = row

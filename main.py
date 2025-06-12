@@ -261,7 +261,7 @@ class Game:
         self.image_label_complete.grid(row=0, column=0)
 
         click_bt = tk.Button(
-            self.button_frame, text="Start game",
+            self.button_frame, text="Start Game",
             background='cyan', command=self.randomize_pictures
         )
         click_bt.pack(pady=5)
