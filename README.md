@@ -2,9 +2,6 @@
 
 ## How to run
 
-### Executable (Only Windows)
-To run the game out of the box, go into the folder `executable` and double click in `Game.exe`
-
 ### Through Console
 All the console commands are executed inside this folder.
 
