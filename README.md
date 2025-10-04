@@ -1,5 +1,7 @@
 # 8 Game Puzzle
 
+Puzzle game with autocomple feature. The autocomplete uses AI algorithm to find the best possible movement to solve the puzzle in the least amount of moves. This algorithm is called ``A* algorithm``.
+
 ## How to run
 
 ### Through Console
